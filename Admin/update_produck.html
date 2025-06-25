@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Update Produk</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .product-form {
+        max-width: 600px;
+        margin: 30px auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #f8f9fa;
+      }
+      .product-list {
+        margin: 30px auto;
+        max-width: 800px;
+      }
+      .product-item {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container">
+        <a class="navbar-brand" href="#">Admin Panel</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="../products.html">View Products</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-danger" href="../index.html">Logout</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Product Upload Form -->
+    <div class="container">
+      <div class="product-form">
+        <h3 class="text-center">Upload Produk</h3>
+        <form id="productForm">
+          <input type="hidden" id="editIndex" value="" />
+          <!-- Hidden input for editing -->
+          <div class="mb-3">
+            <label for="productImage" class="form-label">Upload Gambar</label>
+            <input
+              type="file"
+              id="productImage"
+              class="form-control"
+              accept="image/*"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="productTitle" class="form-label">Judul Produk</label>
+            <input
+              type="text"
+              id="productTitle"
+              class="form-control"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="productPrice" class="form-label">Harga Produk</label>
+            <input
+              type="number"
+              id="productPrice"
+              class="form-control"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-primary w-100">
+            Tambah Produk
+          </button>
+        </form>
+      </div>
+
+      <!-- Product List -->
+      <div class="product-list">
+        <h3 class="text-center">Daftar Produk</h3>
+        <div id="productContainer"></div>
+      </div>
+    </div>
+
+    <script>
+      // Function to load existing products from localStorage
+      function loadProducts() {
+        const products = JSON.parse(localStorage.getItem("products")) || [];
+        const productContainer = document.getElementById("productContainer");
+        productContainer.innerHTML = "";
+
+        products.forEach((product, index) => {
+          const productItem = document.createElement("div");
+          productItem.classList.add("product-item");
+          productItem.innerHTML = `
+            <div>
+              <img src="${product.image}" alt="${
+            product.title
+          }" style="width: 100px; height: 100px; object-fit: cover;" />
+            </div>
+            <div>
+              <h5>${product.title}</h5>
+              <p>Harga: $${product.price.toFixed(2)}</p>
+            </div>
+            <button class="btn btn-warning btn-sm" onclick="editProduct(${index})">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${index})">Hapus</button>
+          `;
+          productContainer.appendChild(productItem);
+        });
+      }
+
+      // Function to handle product form submission
+      document.getElementById("productForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const productImage = document.getElementById("productImage").files[0];
+        const productTitle = document.getElementById("productTitle").value;
+        const productPrice = parseFloat(
+          document.getElementById("productPrice").value
+        );
+        const editIndex = document.getElementById("editIndex").value;
+
+        if (!productImage || !productTitle || !productPrice) {
+          alert("Semua field harus diisi!");
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const imageData = e.target.result;
+
+          const newProduct = {
+            image: imageData,
+            title: productTitle,
+            price: productPrice,
+          };
+
+          const products = JSON.parse(localStorage.getItem("products")) || [];
+
+          if (editIndex !== "") {
+            // Edit product
+            products[editIndex] = newProduct;
+          } else {
+            // Add new product
+            products.push(newProduct);
+          }
+
+          localStorage.setItem("products", JSON.stringify(products));
+
+          loadProducts();
+          alert(
+            editIndex !== ""
+              ? "Produk berhasil diperbarui!"
+              : "Produk berhasil ditambahkan!"
+          );
+          document.getElementById("productForm").reset();
+          document.getElementById("editIndex").value = ""; // Reset editIndex
+        };
+
+        reader.readAsDataURL(productImage);
+      });
+
+      // Function to delete a product
+      function deleteProduct(index) {
+        const products = JSON.parse(localStorage.getItem("products")) || [];
+        products.splice(index, 1);
+        localStorage.setItem("products", JSON.stringify(products));
+        loadProducts();
+      }
+
+      // Function to edit a product
+      function editProduct(index) {
+        const products = JSON.parse(localStorage.getItem("products")) || [];
+        const product = products[index];
+
+        document.getElementById("productImage").value = ""; // Clear image input
+        document.getElementById("productTitle").value = product.title;
+        document.getElementById("productPrice").value = product.price;
+        document.getElementById("editIndex").value = index; // Set edit index
+      }
+
+      // Load products on page load
+      loadProducts();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

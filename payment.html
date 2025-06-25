@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Success</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .success-message {
+        text-align: center;
+        padding: 20px;
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        border-radius: 5px;
+        color: #155724;
+        font-size: 1.2em;
+      }
+      .order-summary {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-top: 30px;
+      }
+      .order-summary h5 {
+        font-weight: bold;
+      }
+      .shipping-info p {
+        font-size: 1.1em;
+      }
+      .footer {
+        margin-top: 40px;
+        background-color: #f8f9fa;
+        padding: 20px;
+        text-align: center;
+        font-size: 0.9em;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          <img src="Assets/Benner.png" alt="Logo" width="70" />
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="products.html">Product</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="cart.html">Cart</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="contact.html">Contact Us</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="login.html">Login</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Success Message -->
+    <div class="container my-5">
+      <div class="success-message">
+        <h4>Payment Successful!</h4>
+        <p>
+          Your order has been placed successfully. Your items will be shipped
+          within 3 days from the order date.
+        </p>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="order-summary">
+        <h5>Order Summary</h5>
+        <div id="orderItems"></div>
+        <div class="d-flex justify-content-between mt-3">
+          <p><strong>Total</strong></p>
+          <p id="orderTotal" class="total-price">$0.00</p>
+        </div>
+      </div>
+
+      <!-- Shipping Information -->
+      <div class="shipping-info">
+        <h5>Shipping Information</h5>
+        <p id="shippingName"></p>
+        <p id="shippingPhone"></p>
+        <p id="shippingEmail"></p>
+        <p id="shippingAddress"></p>
+        <p>
+          <strong>Estimated Delivery Time:</strong> Within 3 days from the order
+          date.
+        </p>
+      </div>
+
+      <!-- Back to Home Button -->
+      <div class="mt-4 text-center">
+        <a href="index.html" class="btn btn-primary">Back to Home</a>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer bg-dark text-white py-4">
+      <div class="container text-center">
+        <p>&copy; 2024 Shoe Store. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+      // Function to fetch order details from localStorage and display them
+      function displayOrderDetails() {
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        const orderItemsContainer = document.getElementById("orderItems");
+        let total = 0;
+
+        // Displaying the cart items
+        orderItemsContainer.innerHTML = "";
+        cart.forEach((item) => {
+          const itemTotal = item.price * item.quantity;
+          total += itemTotal;
+
+          const itemElement = document.createElement("div");
+          itemElement.classList.add(
+            "d-flex",
+            "justify-content-between",
+            "align-items-center",
+            "my-2"
+          );
+
+          itemElement.innerHTML = `
+            <div>
+              <strong>${item.name}</strong><br>
+              Size: ${item.size}, Quantity: ${item.quantity}
+            </div>
+            <div>$${itemTotal.toFixed(2)}</div>
+          `;
+          orderItemsContainer.appendChild(itemElement);
+        });
+
+        // Update the total price
+        document.getElementById("orderTotal").textContent = `$${total.toFixed(
+          2
+        )}`;
+
+        // Fetch shipping details from localStorage
+        const shippingInfo = JSON.parse(localStorage.getItem("shippingInfo"));
+        if (shippingInfo) {
+          document.getElementById(
+            "shippingName"
+          ).textContent = `Full Name: ${shippingInfo.fullName}`;
+          document.getElementById(
+            "shippingPhone"
+          ).textContent = `Phone: ${shippingInfo.phoneNumber}`;
+          document.getElementById(
+            "shippingEmail"
+          ).textContent = `Email: ${shippingInfo.email}`;
+          document.getElementById(
+            "shippingAddress"
+          ).textContent = `Address: ${shippingInfo.address}`;
+        }
+      }
+
+      // Call the function to display order details
+      displayOrderDetails();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
